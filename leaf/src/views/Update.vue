@@ -1,45 +1,91 @@
 <template>
-    <div  id="register">
-      <h1>title here</h1>
+    <div id="update">
+      <h1>Update Shop Info</h1>
             <div class="field">
-            <label class="label">Message</label>
-            <div class="control">
-                <textarea class="textarea" placeholder="Message" v-model="form.message"></textarea>
+            <label class="label">Update Shop Info</label>
+                <label class="label">Name</label>
+                    <div class="control">
+                    <input v-model="form.name" class="input" type="text" placeholder="Text input">
+                    </div>
+
+                    <label class="label">Telephone</label>
+                    <div class="control">
+                    <input v-model="form.telephone" class="input" type="text" placeholder="Text input">
+                    </div>
+
+                    <label class="label">State</label>
+                    <div class="control">
+                    <input v-model="form.statecode" class="input" type="text" placeholder="Text input">
+                    </div>
+
+                    <label class="label">Message</label>
+                    <div class="control">
+                        <textarea class="textarea" placeholder="Message" v-model="form.zip"></textarea>
+                    </div>
             </div>
-            </div>
+
+            <button type="button" v-on:click="update()">Update</button>
 
 
     </div>
 </template>
 
 <script>
+   
+    import axios from 'axios'
+    import { authHeader } from '../auth/auth-header';
+
     export default {
-        name: 'Register',
+        props: {
+           id: {
+
+            required: true
+            },
+        },
+        computed:{
+            user() {
+                return JSON.parse(localStorage.getItem('user'));
+            }
+
+        },
+        name: 'Update',
         data() {
             return {
-                input: {
-                    username: "",
-                    password: "",
-                    email: ""
+                form: {
+                    name: "",
+                    telephone: "",
+                    statecode: "",
+                    zip: ""
                 }
             }
         },
         methods: {
-            login() {
-                if(this.input.username != "" && this.input.password != "" && this.input.email != "") {
-   
-                    // axios request here
+            update() {
+                 axios.patch('http://localhost:3000/shop/'+this.id, this.form, {headers: authHeader()}).then((shop) => {
+                           // this.$router.push({ path: '/' })
+                        });
 
-                } else {
-                    console.log("A username and password and email must be present");
-                }
             }
+        },
+        created() {
+            console.log(this.id)
+                axios.get('http://localhost:3000/shop/'+this.id).then((response) => {
+                console.log(response.data)
+                    this.form = response.data
+
+                }, (error) => {
+                console.log(error)
+                })
+
+
+
         }
-    }
+}
+
 </script>
 
 <style scoped>
-    #register {
+    #update {
         width: 500px;
         border: 1px solid #CCCCCC;
         background-color: #FFFFFF;

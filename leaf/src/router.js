@@ -33,9 +33,9 @@ const router = new Router({
       component: Register
     },
     {
-      path: '/update',
+      path: '/update/:id',
       name: 'update',
-      component: Update
+      component: Update, props: true
     },
     {
       path: '/shop/:id',
