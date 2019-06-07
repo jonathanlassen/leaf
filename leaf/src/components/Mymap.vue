@@ -1,55 +1,119 @@
 <template>
-    <div id="mymap" style="height: 100%; display: flex;">
-    
+    <div id="mymap" style="height: 90%; display: flex;">
+
       <div id="map2"></div>
      
       <v-map  style="width: 60%;" ref="map" :zoom="zoom" :center="initialLocation" v-on:update:bounds="updateBounds($event)" v-on:ready="ready($event)"> 
-        <v-tilelayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"></v-tilelayer>
-        <div v-for="(data, index) in inMap(mapShops)">
-          <l-marker :lat-lng="reversedGeo(data.geometry.coordinates)" @click="handleClick(index)" :ref="`mypopup${index}`">
-            <l-popup :style="{ width: '350px' }" :options="{closeOnClick: false }">
-              {{data.properties.Name}}
-            <img v-if="details[index]" v-bind:src="details[index]" :style="{ 'max-width': '300px','max-height': '300px' }"  />    
+        <v-tilelayer url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png"></v-tilelayer>
+  <l-marker-cluster :options="clusterOptions" @clusterclick="click()"  ref="clusterRef">
+
+        <div v-for="(data, index) in inMap(mapShops)"> 
+      
+          <l-marker :lat-lng="reversedGeo(data.geometry.coordinates)" @click="handleClick(data.id)" :ref="`mypopup${data.id}`">
+            <l-popup :style="{ width: '350px' }" :options="{ closeOnClick: false, autoPanPadding: 0 }">
+             <span> {{data.properties.Name}}</span>
+            <img v-if="details[data.id]" v-bind:src="details[data.id]" :style="{ 'max-width': '200px','max-height': '200px' }"  />    
             </l-popup>
+             <l-tooltip> {{data.properties.Name}}</l-tooltip>
           </l-marker>
-        </div>
        
+        </div>
+        </l-marker-cluster>
       </v-map>
-      <div class="" style="width: 40%; display: flex; flex-direction: row; flex-wrap: wrap; overflow: auto; justify-content: space-evenly; padding: 30px; align-items: stretch;">
-          <div class="cursor-pointer" v-for="(data, index) in inMap(mapShops)" @click="handleClick2(index)" style="margin: 5px; padding: 5px; max-width: 210px;  align-items: stretch; flex-grow: 1; " >  
-                <div style="height: 100%;" class="max-w-sm rounded overflow-hidden shadow-lg">
-                  <img class="w-full overflow-hidden" src="../assets/x.png" alt="Sunset in the mountains">
+     
+        
+           <div v-if="view_single" style="width: 40%; display: flex; flex-direction: row; flex-wrap: wrap; overflow: auto; justify-content: space-evenly; padding: 30px; align-items: stretch;">
+              <div class="rounded overflow-hidden shadow-lg">
+                 
                   <div class="px-3 py-3">
-                    <div class="font-bold text-xl mb-2">{{data.properties.Name}}</div>
-                    <p class="text-grey-darker text-base">
+                  <img class="w-full overflow-hidden" :src="randomImage(showing_shop.id)" alt="" style="object-fit: cover; object-position: 100% 0; max-height: 400px;" >
+                    <div class="font-bold text-l mb-2">{{showing_shop.properties.Name}}</div>
+                    <p class="text-grey-darker text-sm">
                       Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
                     </p>
-                  </div>
+                    <div>
+                      (978) 213-8369
+                    </div>
+                    <div>
+                      1258 Gorham St.
+                      Lowell, MA 01852
+                    </div>
+                    <div>
+                  
+                    </div>
+                    <viewer :images="shopimages">
+                      <img v-for="src in shopimages" :src="imgCompute(src)" :key="src" class='image' style="max-width: 50px; max-height: 50px; object-fit: cover">
+                    </viewer>
 
-                </div>
+                  <div v-if="user"> 
+                  <router-link :to="{ name: 'claim', params: { id: showing_shop.id }}">Claim</router-link>
+                  <router-link :to="{ path: '/claim/'.index }">Claim</router-link>
+                   <router-link to="claim/{index}" class="dropdown-item">Home</router-link>
+
+                       <router-link to="/claim/">  <a class="inline-block text-sm px-4 py-2 leading-none border rounded hover:border-transparent hover:text-blue hover:bg-white mt-4 mr-2 lg:mt-0">CLAIM</a></router-link></div>
+                  </div>
+                 
+              </div>
+               <button @click="closeShopView()">close</button>
           </div>
+
+
+
+           <div v-if="!view_single" style="width: 40%; display: flex; flex-direction: row; flex-wrap: wrap; overflow: auto; justify-content: space-evenly; padding: 30px; align-items: stretch;">
+              <div v-for="(data, index) in Max40(inMap(mapShops))" class="p-3 h-96 xl:w-1/2 lg:w-full rounded overflow-hidden shadow-lg">
+                 
+                  <img class=" h-32 w-full overflow-hidden" :src="randomImage(data.id)" alt="" style="object-fit: cover; object-position: 100% 0; max-height: 300px;" >
+                    <div class="font-bold text-l mb-2">{{data.properties.Name}}</div>
+                    <p class="text-grey-darker text-sm">
+                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
+                    </p>
+                    <div>
+                      (978) 213-8369
+                    </div>
+                    <div>
+                      1258 Gorham St.
+                      Lowell, MA 01852
+                    </div>
+                    <div>
+                    
+                    </div>
+
+
+
+                  </div>
+                 
+             
+               
+          </div>
+
+
+
       
       </div>
   </div>
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LPopup, LControl } from "vue2-leaflet";
+import { LMap, LTileLayer, LMarker, LPopup, LControl, LTooltip } from "vue2-leaflet";
 import { latLng, Icon, icon } from 'leaflet';
 import shops from '../shops';
+import axios from 'axios'
 import * as VueGoogleMaps from 'vue2-google-maps';
-import axios from 'axios';
+import Vue2LeafletMarkerCluster from 'vue2-leaflet-markercluster'
 
 export default {
 
   name: 'Mymap',
  
   components: {
+
     "v-map": LMap,
     "v-tilelayer": LTileLayer,
     'l-marker':LMarker,
     'l-popup':LPopup,
     'l-control': LControl,
+    'l-tooltip': LTooltip,
+    'l-marker-cluster':Vue2LeafletMarkerCluster
   },
   data() {
     return {
@@ -57,7 +121,8 @@ export default {
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       zoom: 13,
       markerLatLng: [42.3601, -71.0589],
-      shopDatabase: shops.features,
+     // shopDatabase: shops.features,
+      shopDatabase: [],
       bounds: '',
       styleObject: {
         'background-color': 'white',
@@ -67,14 +132,49 @@ export default {
         overflow: 'auto'
       },
       details: [],
-      current_index:'',
-      ran:''
+      showing_shop:{},
+      current_index:this.$route.params.id,
+      ran:'',
+      view_single: false,
+      shopimages:['1.png', '2.png', '3.png' ],
+          clusterOptions: {
+            "disableClusteringAtZoom": 12
+          },
     }
   },
+
+  computed:{
+      user() {
+          return JSON.parse(localStorage.getItem('user'));
+    }
+
+  },
+
   methods:
   {
+    click: function (e) {
+       // alert("clusterclick")
+      },
+    closeShopView()
+    {
+        this.view_single = false
+        this.$router.replace("/")
+    },
+    imgCompute(img)
+    {
+          
+           return require('../assets/'+img);
+    },
 
+    randomImage (id) { 
+        var random = id.toString().split('').pop();
+        return require('../assets/'+random+'.png');
+         
+
+    },
     inMap(shops) {
+
+      //console.log(shops[0])
         if (this.bounds)
         {
             shops = this.shopDatabase.filter((shop) => (
@@ -84,7 +184,14 @@ export default {
               this.bounds._southWest.lng < shop.geometry.coordinates[0] 
             ));
         }
+        
         return shops;
+    },
+
+    Max40(shops){
+
+       if (shops)
+        return shops.slice(0,40)
     },
     reversedGeo (coord) {
       return [coord[1], coord[0]]
@@ -112,9 +219,14 @@ export default {
     },
     handleClick2(index)
     {
-      this.current_index = index
 
-      const current_shop = this.inMap(this.mapShops)[index]
+      this.view_single = !this.view_single;
+      this.current_index = index
+      this.$router.replace("/shop/"+index)
+    // const current_shop = this.inMap(this.mapShops)[index]
+   
+       const current_shop = this.shopDatabase.filter((shop) => ( shop.id = index));
+      
 
       const newcenter=this.reversedGeo(current_shop.geometry.coordinates);
      // this.$refs['mypopup'+index][0].mapObject.panTo()
@@ -142,11 +254,15 @@ export default {
 
     handleClick(index)
     {
-     // console.log('should not be at handleclick')
+      this.view_single = !this.view_single;
       this.current_index = index
-
-      const current_shop = this.inMap(this.mapShops)[index]
-      const newcenter=this.reversedGeo(current_shop.geometry.coordinates);
+      console.log(index)
+      const current_shop = this.shopDatabase.filter((shop) => ( shop.id === index));
+       console.log(current_shop[0])
+      this.showing_shop = current_shop[0];
+      console.log(this.showing_shop)
+      const newcenter=this.reversedGeo(current_shop[0].geometry.coordinates);
+      this.$router.replace("/shop/"+index)
      //  this.$refs.map.mapObject.panTo(newcenter);
   //    this.$refs['mypopup'+index][0].mapObject.openPopup()
     //  this.$refs.mypopup[2].mapObject.openPopup()
@@ -156,12 +272,12 @@ export default {
   //    this.$set(this.initialLocation, 0, newcenter[0])
  
   //    this.$set(this.initialLocation, 1, newcenter[1])
-
+        console.log(this.$refs.clusterRef.mapObject)
 
       var service;
 
         var request = {
-          query: current_shop.properties.Name,
+          query: current_shop[0].properties.Name,
           fields: ['place_id', 'name', 'geometry'],
           locationBias: {lat: newcenter[0], lng: newcenter[1]}
         };
@@ -183,25 +299,46 @@ export default {
     },
 
     callback2 (results, status){
-
-
       if (results.photos)
       {
          const rand = Math.floor(Math.random() * results.photos.length); 
         this.$set(this.details, this.current_index, results.photos[rand].getUrl())
       }
-
     }
-
-
-
   },
 
 
   created() {
-   
-    this.mapShops = this.shopDatabase
-  
+  // this.mapShops = this.shopDatabase
+   // console.log(this.shopDatabase2)
+   // get shops here
+   // 
+          let tempshops = [];
+          axios.get('http://localhost:3000/leaf').then((response) => {
+          this.shops = response.data
+          this.shops.map(shop => {
+            let tempshop = {
+              "id": shop.id, "type": "Feature", "properties": { "Name": shop.title }, "geometry": { "type": "Point", "coordinates": [ parseFloat(shop.long), parseFloat(shop.lat) ] } 
+            };
+            tempshops.push(tempshop);
+           // 
+          })
+
+          this.shopDatabase = tempshops
+          this.mapShops = this.shopDatabase
+        }, (error) => {
+          console.log(error)
+        })
+
+
+        this.user = localStorage.getItem('user');
+
+
+
+   // this.$router.replace("/")
+    if (this.current_index)
+      this.view_single=true;
+
   }
 }
 </script>
@@ -209,9 +346,19 @@ export default {
 <style>
 @import "~leaflet/dist/leaflet.css";
 @import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
+@import "~leaflet.markercluster/dist/MarkerCluster.css";
+@import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
 html,
 body {
   height: 100%;
   margin: 0;
 }
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .75s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+
 </style>

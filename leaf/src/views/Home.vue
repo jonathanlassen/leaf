@@ -1,15 +1,24 @@
 <template>
-  <div id="home" style="height: 100%">
-    this is something
-  </div>
+
+      <my-map></my-map>
+
 </template>
 
 <script>
-import {App} from "../App.vue";
+
+import Mymap from '../components/Mymap';
 
 
 export default {
   name: 'home',
- 
+   components: {
+    'my-map': Mymap
+  },
+ created() {
+   
+
+  }
 }
+
+
 </script>
