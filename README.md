@@ -4,7 +4,7 @@ Find a Framer is a project that allows potential custom framing customers to loc
 
 ### Live Link
 
-A live version of the app can be found at [https://react-leaf.jonathanlassen.now.sh/](https://react-leaf.jonathanlassen.now.sh/)
+A live version of the app can be found at [http://134.209.115.29/](http://134.209.115.29/)
 
 ### Screenshots
 
@@ -15,10 +15,9 @@ A live version of the app can be found at [https://react-leaf.jonathanlassen.now
 
 + Node.js - server
 + Express - node framework
-+ React - front-end framework
++ Vuejs - front-end framework
 + Postgresql - database
 + Knex - convienient wrapper for postgresql
-+ Jest - front-end testing tools
 + Heroku - back-end deployment
 + Zeit - front-end deployment
 + JWT - token-based authentification
