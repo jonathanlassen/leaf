@@ -45,8 +45,8 @@
                
                     this.data = {user: this.user,
                         id: this.id}
-                    console.log(this.data)
-                     axios.post('http://localhost:3000/claim', this.data, {headers: authHeader()}).then((user) => {
+                   
+                     axios.post('https://powerful-wildwood-94772.herokuapp.com/claim', this.data, {headers: authHeader()}).then((user) => {
 
                                 console.log(this.id)
                             this.$router.push({ path: `/update/${parseInt(this.id)}` })
@@ -56,6 +56,22 @@
 
               
             }
+        },
+
+         created() {
+                this.data = {user: this.user,
+                        id: this.id}
+                   
+                     axios.post('http://localhost:3000/claim', this.data, {headers: authHeader()}).then((user) => {
+
+                                console.log(this.id)
+                            this.$router.push({ path: `/update/${parseInt(this.id)}` })
+                            //this.$router.push({ path: '/update', params: {id: this.id}})
+
+                        });
+
+
+
         }
     }
 </script>

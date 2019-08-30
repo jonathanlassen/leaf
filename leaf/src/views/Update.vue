@@ -2,7 +2,7 @@
     <div id="update">
       <h1>Update Shop Info</h1>
             <div class="field">
-            <label class="label">Update Shop Info</label>
+            <label class="label"></label>
                 <label class="label">Name</label>
                     <div class="control">
                     <input v-model="form.name" class="input" type="text" placeholder="Text input">
@@ -62,7 +62,7 @@
         methods: {
             update() {
                  axios.patch('http://localhost:3000/shop/'+this.id, this.form, {headers: authHeader()}).then((shop) => {
-                           // this.$router.push({ path: '/' })
+                             this.$router.push({ path: '/' })
                         });
 
             }
@@ -70,8 +70,9 @@
         created() {
             console.log(this.id)
                 axios.get('http://localhost:3000/shop/'+this.id).then((response) => {
-                console.log(response.data)
+               // console.log(response.data)
                     this.form = response.data
+             
 
                 }, (error) => {
                 console.log(error)

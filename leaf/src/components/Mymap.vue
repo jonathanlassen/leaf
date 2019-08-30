@@ -9,7 +9,7 @@
 
         <div v-for="(data, index) in inMap(mapShops)"> 
       
-          <l-marker :lat-lng="reversedGeo(data.geometry.coordinates)" @click="handleClick(data.id)" :ref="`mypopup${data.id}`">
+          <l-marker :lat-lng="reversedGeo(data.geometry.coordinates)" @click="handleClick(data.id)" cd .>
             <l-popup :style="{ width: '350px' }" :options="{ closeOnClick: false, autoPanPadding: 0 }">
              <span> {{data.properties.Name}}</span>
             <img v-if="details[data.id]" v-bind:src="details[data.id]" :style="{ 'max-width': '200px','max-height': '200px' }"  />    
@@ -24,11 +24,14 @@
         
            <div v-if="view_single" style="width: 40%; display: flex; flex-direction: row; flex-wrap: wrap; overflow: auto; justify-content: space-evenly; padding: 30px; align-items: stretch;">
               <div class="rounded overflow-hidden shadow-lg">
-                 
+
                   <div class="px-3 py-3">
                   <img class="w-full overflow-hidden" :src="randomImage(showing_shop.id)" alt="" style="object-fit: cover; object-position: 100% 0; max-height: 400px;" >
                     <div class="font-bold text-l mb-2">{{showing_shop.properties.Name}}</div>
-                    <p class="text-grey-darker text-sm">
+                    <p v-if="showing_shop.properties.Zip" class="text-grey-darker text-sm">
+                     {{showing_shop.properties.Zip}}
+                    </p>
+                    <p v-if="!showing_shop.properties.Zip" class="text-grey-darker text-sm">
                       Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
                     </p>
                     <div>
@@ -45,12 +48,8 @@
                       <img v-for="src in shopimages" :src="imgCompute(src)" :key="src" class='image' style="max-width: 50px; max-height: 50px; object-fit: cover">
                     </viewer>
 
-                  <div v-if="user"> 
-                  <router-link :to="{ name: 'claim', params: { id: showing_shop.id }}">Claim</router-link>
-                  <router-link :to="{ path: '/claim/'.index }">Claim</router-link>
-                   <router-link to="claim/{index}" class="dropdown-item">Home</router-link>
-
-                       <router-link to="/claim/">  <a class="inline-block text-sm px-4 py-2 leading-none border rounded hover:border-transparent hover:text-blue hover:bg-white mt-4 mr-2 lg:mt-0">CLAIM</a></router-link></div>
+                  <div v-if="user && !user.shop_id"> 
+                       <router-link :to="{ name: 'claim', params: { id: showing_shop.id }}">  <a class="inline-block text-sm px-4 py-2 leading-none border rounded hover:border-transparent hover:text-blue hover:bg-white mt-4 mr-2 lg:mt-0">CLAIM</a></router-link></div>
                   </div>
                  
               </div>
@@ -64,9 +63,12 @@
                  
                   <img class=" h-32 w-full overflow-hidden" :src="randomImage(data.id)" alt="" style="object-fit: cover; object-position: 100% 0; max-height: 300px;" >
                     <div class="font-bold text-l mb-2">{{data.properties.Name}}</div>
-                    <p class="text-grey-darker text-sm">
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
-                    </p>
+                    <p v-if="data.properties.Zip" class="text-grey-darker text-sm">
+                      {{data.properties.Zip}}
+                      </p>
+                      <p v-if="!data.properties.Zip" class="text-grey-darker text-sm">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
+                      </p>
                     <div>
                       (978) 213-8369
                     </div>
@@ -284,9 +286,9 @@ export default {
 
 
 
-        var service = new google.maps.places.PlacesService(document.createElement('div'));
+     //   var service = new google.maps.places.PlacesService(document.createElement('div'));
       //  service.getDetails(request2, function(results, status) {
-        service.findPlaceFromQuery(request, this.callback1);
+    //    service.findPlaceFromQuery(request, this.callback1);
     },
 
     callback1 (results, status){
@@ -314,11 +316,11 @@ export default {
    // get shops here
    // 
           let tempshops = [];
-          axios.get('http://localhost:3000/leaf').then((response) => {
+          axios.get('https://powerful-wildwood-94772.herokuapp.com/leaf').then((response) => {
           this.shops = response.data
           this.shops.map(shop => {
             let tempshop = {
-              "id": shop.id, "type": "Feature", "properties": { "Name": shop.title }, "geometry": { "type": "Point", "coordinates": [ parseFloat(shop.long), parseFloat(shop.lat) ] } 
+              "id": shop.id, "type": "Feature", "properties": { "Name": shop.title, "Zip": shop.zip }, "geometry": { "type": "Point", "coordinates": [ parseFloat(shop.long), parseFloat(shop.lat) ] } 
             };
             tempshops.push(tempshop);
            // 

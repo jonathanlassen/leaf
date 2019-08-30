@@ -42,8 +42,6 @@ const router = new Router({
       name: 'shop',
       component: Home,
     },
-
-
     {
       path: '/about',
       name: 'about',

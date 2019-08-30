@@ -26,12 +26,12 @@
             login() {
                 if(this.input.username != "" && this.input.password != "") {
      
-                        axios.post('http://localhost:3000/login', this.input, {headers: authHeader()}).then((user) => {
+                        axios.post('https://powerful-wildwood-94772.herokuapp.com/login', this.input, {headers: authHeader()}).then((user) => {
 
                         if (user.data.token) {
                             localStorage.setItem('user', JSON.stringify(user.data));
                         }
-                        return user;
+                        this.$router.push({ path: '/' })
 
                         });
                     // const auth = {
@@ -39,7 +39,7 @@
 
 
                 } else {
-                    console.log("A username and password must be present");
+                   // console.log("A username and password must be present");
                 }
             }
         }

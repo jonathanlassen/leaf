@@ -31,14 +31,14 @@
             register() {
                 if(this.input.username != "" && this.input.password != "" && this.input.email != "") {
    
-                    axios.post('http://localhost:3000/register', this.input, authHeader).then((user) => {
+                    axios.post('https://powerful-wildwood-94772.herokuapp.com/leaf/register', this.input, authHeader).then((user) => {
 
                         if (user.token) {
                             // store user details and jwt token in local storage to keep user logged in between page refreshes
                             localStorage.setItem('user', JSON.stringify(user));
                         }
 
-                        return user;
+                        this.$router.push({ path: '/' })
 
                         });
 
