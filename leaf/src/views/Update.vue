@@ -61,7 +61,7 @@
         },
         methods: {
             update() {
-                 axios.patch('http://localhost:3000/shop/'+this.id, this.form, {headers: authHeader()}).then((shop) => {
+                 axios.patch('https://powerful-wildwood-94772.herokuapp.com/leaf/shop/'+this.id, this.form, {headers: authHeader()}).then((shop) => {
                              this.$router.push({ path: '/' })
                         });
 
@@ -69,7 +69,7 @@
         },
         created() {
             console.log(this.id)
-                axios.get('http://localhost:3000/shop/'+this.id).then((response) => {
+                axios.get('https://powerful-wildwood-94772.herokuapp.com/leaf/shop/'+this.id).then((response) => {
                // console.log(response.data)
                     this.form = response.data
              
